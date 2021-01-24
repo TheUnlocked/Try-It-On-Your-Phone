@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_clear_code"
+        android:icon="@drawable/ic_baseline_delete_24"
+        android:title="@string/menu_clear_code"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_hello_world"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="@string/menu_hello_world"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_run_code"
+        android:icon="@drawable/ic_baseline_play_arrow_24"
+        android:title="@string/menu_run_code"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_select_language"
+        android:icon="@drawable/ic_baseline_code_24"
+        android:title="@string/menu_select_language"
+        app:showAsAction="always" />
+
+</menu>
