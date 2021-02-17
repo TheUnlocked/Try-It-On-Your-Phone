@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.room.Room
 import com.github.theunlocked.tryitonyourphone.database.AppDatabase
 import com.github.theunlocked.tryitonyourphone.database.entities.History
+import com.github.theunlocked.tryitonyourphone.database.entities.HistoryKind
 import com.github.theunlocked.tryitonyourphone.ui.code.CodeViewModel
 import kotlinx.coroutines.launch
 
@@ -21,8 +22,12 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var database: AppDatabase
 
+    var firstWakeup: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        firstWakeup = true
 
         database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "db").build()
 
@@ -87,12 +92,24 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onDestroy() {
-        saveHistoryState()
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
+        saveHistoryState(HistoryKind.UNSAVED)
     }
 
-    fun saveHistoryState() {
+    override fun onResume() {
+        super.onResume()
+
+        if (firstWakeup) {
+            lifecycleScope.launch { database.historyDao().saveUnsaved() }
+        }
+        else {
+            lifecycleScope.launch { database.historyDao().deleteUnsaved() }
+        }
+        firstWakeup = !firstWakeup
+    }
+
+    fun saveHistoryState(saveMode: HistoryKind = HistoryKind.NORMAL) {
         val model = ViewModelProvider(this).get(CodeViewModel::class.java)
         val lang = model.language.value
         val code = model.code.value
@@ -101,12 +118,12 @@ class MainActivity : AppCompatActivity() {
             val latestHistory = database.historyDao().getLatestHistory()
 
             if (lang != null) {
-                val proposedHistory = History(lang.id, code!!)
+                val proposedHistory = History(lang.id, code!!, historyKind = saveMode)
 
                 if (code != "" &&
                     (latestHistory == null || !latestHistory.isSimilarTo(proposedHistory)) &&
                     code != lang.helloWorld?.code) {
-                    database.historyDao().insertWithTimestamp(proposedHistory)
+                    database.historyDao().insert(proposedHistory)
                 }
             }
         }

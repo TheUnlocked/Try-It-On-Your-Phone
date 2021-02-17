@@ -10,7 +10,8 @@ data class History(
     @ColumnInfo(name = "language_id") val languageId: String,
     @ColumnInfo(name = "code") val code: String,
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "created_at") val createdAt: Long = 0
+    @ColumnInfo(name = "created_at") val createdAt: Long = 0,
+    @ColumnInfo(name = "kind") val historyKind: HistoryKind = HistoryKind.NORMAL
 ) {
     fun isSimilarTo(other: History): Boolean =
         languageId == other.languageId && code == other.code
